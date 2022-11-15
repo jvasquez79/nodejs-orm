@@ -1,15 +1,20 @@
 const faker = require('faker');
 const boom = require('@hapi/boom');
 
+//const pool = require('../libs/postgres.pool'); // se deja de usar por sequelize
+const { models } = require('./../libs/sequelize');
+
 class ProductsService {
 
   constructor(){
-    this.products = [];
+    //this.products = [];
     this.generate();
+    //this.pool = pool;
+    //this.pool.on('error', (err) => console.log(err));
   }
 
   generate() {
-    const limit = 100;
+    /*const limit = 100;
     for (let index = 0; index < limit; index++) {
       this.products.push({
         id: faker.datatype.uuid(),
@@ -18,20 +23,34 @@ class ProductsService {
         image: faker.image.imageUrl(),
         isBlock: faker.datatype.boolean(),
       });
-    }
+    }*/
   }
 
   async create(data) {
-    const newProduct = {
+    /*const newProduct = {
       id: faker.datatype.uuid(),
       ...data
     }
     this.products.push(newProduct);
+    */
+    const newProduct = await models.Product.create(data);
     return newProduct;
   }
 
-  find() {
-    return this.products;
+  async find() {
+    const query = 'SELECT * FROM tasks';
+    //const rta = await this.pool.query(query);
+    //return rta.rows;
+    /*const [data, metadata] = await sequelize.query(query);
+    return {
+      data,
+      metadata
+    }*/
+    //const [data] = await sequelize.query(query);
+    const products = await models.Product.findAll({
+      include: ['category']
+    });
+    return products;
   }
 
   async findOne(id) {
